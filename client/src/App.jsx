@@ -3,58 +3,54 @@ import AuthModule from './components/AuthModule.jsx';
 import StudentPortal from './components/StudentPortal.jsx';
 
 export default function App() {
-    const [activeView, setActiveView] = useState('auth');
-    const [activeTab, setActiveTab] = useState('login');
+  const [activeView, setActiveView] = useState('auth');
+  const [activeTab, setActiveTab] = useState('login');
 
-    useEffect(() => {
-        const handleHashChange = () => {
-            const hash = window.location.hash;
+  
+  const scrollToAuth = () => {
+    setTimeout(() => {
+      document.getElementById('auth')?.scrollIntoView({
+        behavior: 'smooth'
+      });
+    }, 100);
+  };
 
-            if (hash === '#login') {
-                setActiveView('auth');
-                setActiveTab('login');
-                scrollToAuth();
-            } else if (hash === '#register') {
-                setActiveView('auth');
-                setActiveTab('register');
-                scrollToAuth();
-            } else if (hash === '#student') {
-                setActiveView('student');
-                scrollToAuth();
-            }
-        };
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash;
 
-        const scrollToAuth = () => {
-            const authElem = document.getElementById('auth-section');
+      if (hash === '#login') {
+        setActiveView('auth');
+        setActiveTab('login');
+        scrollToAuth();
+      } else if (hash === '#register') {
+        setActiveView('auth');
+        setActiveTab('register');
+        scrollToAuth();
+      } else if (hash === '#student') {
+        setActiveView('student');
+        scrollToAuth();
+      }
+    };
 
-            if (authElem) {
-                authElem.scrollIntoView({
-                    behavior: 'smooth'
-                });
-            }
-        };
+    window.addEventListener('hashchange', handleHashChange);
+    handleHashChange();
 
-        handleHashChange();
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+    };
+  }, []);
 
-        window.addEventListener('hashchange', handleHashChange);
+  return (
+    <>
+      {activeView === 'auth' && (
+        <AuthModule
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+        />
+      )}
 
-        return () => {
-            window.removeEventListener(
-                'hashchange',
-                handleHashChange
-            );
-        };
-    }, []);
-
-    return (
-        <div style={{ padding: '20px 0' }}>
-            {activeView === 'student' ? (
-                <StudentPortal
-                    onBackToHome={() => setActiveView('auth')}
-                />
-            ) : (
-                <AuthModule initialMode={activeTab} />
-            )}
-        </div>
-    );
+      {activeView === 'student' && <StudentPortal />}
+    </>
+  );
 }
